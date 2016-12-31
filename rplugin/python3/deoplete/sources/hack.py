@@ -28,7 +28,14 @@ class Source(Base):
         lines = self.vim.current.buffer[:]
         lines[line] = lines[line][:column] + TOKEN + lines[line][column:]
         text = str.encode('\n'.join(lines))
-        command = [self.hh_client, '--auto-complete', '--json']
+        command = [
+                self.hh_client,
+                '--auto-complete',
+                '--json',
+                '--from', 'vim',
+                '--retries', '0',
+                '--retry-if-init', 'false',
+                ]
         try:
             process = Popen(command, stdout=PIPE, stdin=PIPE)
             timer = Timer(self.timeout, lambda p: p.kill(), [process])
@@ -48,5 +55,5 @@ def parse_result(result):
     word = result['name']
     menu = result['type']
     if menu.startswith('(function'):
-        menu = menu[9:-1]
+        menu = 'f' + menu[9:-1]
     return {'word': word, 'menu': menu}
