@@ -146,12 +146,35 @@ endfunction
 " Get the Hack type at the current cursor position.
 function! hack#get_type()
   let pos = line('.').':'.col('.')
-  let cmd = g:hack#hh_client.' --type-at-pos '.pos
+  let cmd = join(<SID>HackClientInvocation(['--type-at-pos', pos]))
   let stdin = join(getline(1,'$'), "\n")
 
   let output = 'HackType: '.system(cmd, stdin)
   let output = substitute(output, '\n$', '', '')
   echo output
+endfunction
+
+" Go to definition
+function! hack#goto_definition()
+  if !has('nvim') && v:version < 800
+    echom 'Vim8 or Neovim is required for this function.'
+    return
+  endif
+
+  let pos = line('.').':'.col('.')
+  let cmd = join(<SID>HackClientInvocation(['--json', '--ide-get-definition', pos]))
+  let stdin = join(getline(1,'$'), "\n")
+
+  let output = get(json_decode(system(cmd, stdin)), 0, {})
+  if !has_key(output, 'definition_pos')
+    return
+  endif
+
+  let pos = output.definition_pos
+  if !empty(pos.filename)
+    execute 'edit '.(pos.filename)
+  endif
+  call cursor(pos.line, pos.char_start)
 endfunction
 
 " Toggle auto-typecheck.
@@ -190,6 +213,7 @@ endfunction
 command! HackToggle call hack#toggle()
 command! HackMake   call hack#typecheck()
 command! HackType   call hack#get_type()
+command! HackGotoDefinition call hack#goto_definition()
 command! -range=% HackFormat call hack#format(<line1>, <line2>)
 command! -nargs=1 HackFindRefs call hack#find_refs(<q-args>)
 command! -nargs=? -bang HackSearch call hack#search('<bang>' == '!', <q-args>)
