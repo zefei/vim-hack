@@ -155,9 +155,9 @@ function! hack#get_type()
 endfunction
 
 " Go to definition
-function! hack#goto_definition()
+function! hack#goto_def()
   if !has('nvim') && v:version < 800
-    echom 'Vim8 or Neovim is required for this function.'
+    echom 'Vim 8.0 or Neovim is required for this function.'
     return
   endif
 
@@ -213,7 +213,7 @@ endfunction
 command! HackToggle call hack#toggle()
 command! HackMake   call hack#typecheck()
 command! HackType   call hack#get_type()
-command! HackGotoDefinition call hack#goto_definition()
+command! HackGotoDef call hack#goto_def()
 command! -range=% HackFormat call hack#format(<line1>, <line2>)
 command! -nargs=1 HackFindRefs call hack#find_refs(<q-args>)
 command! -nargs=? -bang HackSearch call hack#search('<bang>' == '!', <q-args>)
