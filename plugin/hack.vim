@@ -12,10 +12,10 @@
 " grant of patent rights can be found in the PATENTS file in the same
 " directory.
 
-if exists("g:loaded_hack")
+if exists("g:loaded_hack2")
   finish
 endif
-let g:loaded_hack = 1
+let g:loaded_hack2 = 1
 
 if !exists('g:hack#hh_client')
   let g:hack#hh_client = 'hh_client'
